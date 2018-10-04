@@ -123,6 +123,8 @@ RelatedPopups.prototype = {
         $body.addClass('non-scrollable');
     },
     closePopup: function(response) {
+        console.log('CLOSE RELATED POPUP');
+
         var previousWindow = this.windowStorage.previous();
         var self = this;
 

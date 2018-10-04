@@ -14,7 +14,8 @@ var gulp = require('gulp'),
     pxtorem = require('postcss-pxtorem'),
     autoprefixer = require('autoprefixer'),
     shell = require('gulp-shell'),
-    replace = require('gulp-replace');
+    replace = require('gulp-replace'),
+    inlineSourceMap = require('gulp-inline-sourcemap');
 
 var cssProcessors = [
     autoprefixer(),
@@ -26,15 +27,24 @@ var cssProcessors = [
 ];
 
 gulp.task('scripts', function() {
-    return browserify('./jet/static/jet/js/src/main.js')
+    return browserify({
+        entries: './jet/static/jet/js/src/main.js',
+        debug: true
+        })
         .bundle()
         .on('error', function(error) {
             console.error(error);
         })
         .pipe(source('bundle.min.js'))
         .pipe(buffer())
-        .pipe(uglify())
-        .pipe(gulp.dest('./jet/static/jet/js/build/'));
+	.pipe(sourcemaps.init({loadMaps: true}))
+	.pipe(sourcemaps.write('./'))
+	//.pipe(uglify())
+        .pipe(gulp.dest('./jet/static/jet/js/build/'))
+	.pipe(shell([
+		'cp <%= file.path %>* ../../stack/backend/salestack/core/static/js/', 
+	]))
+	;
 });
 
 gulp.task('styles', function() {
